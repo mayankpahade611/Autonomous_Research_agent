@@ -1,0 +1,7 @@
+python-dotenv
+fastapi
+uvicorn
+qdrant-client
+langchain
+langchain-community
+sentecence-transformers
