@@ -4,4 +4,5 @@ uvicorn
 qdrant-client
 langchain
 langchain-community
-sentecence-transformers
+sentence-transformers
+langchain-text-splitters
