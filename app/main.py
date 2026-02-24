@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from pydantic import BaseModel
 from app.retrieval.vector_store import get_vector_store
 from app.retrieval.ingest import ingest_document
 from app.retrieval.rag_pipeline import generate_answer
@@ -19,11 +20,15 @@ def test_vector():
     store.add_texts(["AI startups are growing rapidly in 2026."])
     return {"status": "vector saved"} 
 
+class IngestRequest(BaseModel):
+    text: str
+    source: str = "manual_input"  # default
+
 @app.post("/ingest")
-def ingest(text: str):
+def ingest(request: IngestRequest):
     count = ingest_document(
-        text,
-        metadata={"source": "manual_input"}
+        text=request.text,
+        metadata={"source": request.source}
     )
     return {"chunks_added": count}
 
