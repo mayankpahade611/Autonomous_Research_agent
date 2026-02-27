@@ -10,5 +10,6 @@ class Settings:
     POSRGRES_URL = os.getenv("POSRGRES_URL")
     REDIS_HOST = os.getenv("REDIS_HOST")
     REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
+    TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
 
 settings = Settings()

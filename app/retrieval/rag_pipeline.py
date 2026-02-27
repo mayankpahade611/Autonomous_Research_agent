@@ -7,14 +7,21 @@ def generate_answer(query: str):
     context = "\n\n".join([doc.page_content for doc in docs])
 
     prompt = f"""
-    Use the following context to answer the question.
-    If the answer is not in context, say you don't know.
+    You are a research assistant.
+
+    Answer ONLY using the provided context.
+    If the answer is not explicitly present in the context, say:
+    "I don't have enough information in the provided sources."
+
+    Do NOT fabricate.
 
     Context:
     {context}
 
     Question:
     {query}
+
+    Answer:
     """
 
     llm = get_llm()

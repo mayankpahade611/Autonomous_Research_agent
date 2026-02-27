@@ -3,6 +3,8 @@ from pydantic import BaseModel
 from app.retrieval.vector_store import get_vector_store
 from app.retrieval.ingest import ingest_document
 from app.retrieval.rag_pipeline import generate_answer
+from app.graph import research_graph
+from pydantic import BaseModel
 
 app = FastAPI(title="Autonomos Reserach Agent")
 
@@ -35,3 +37,15 @@ def ingest(request: IngestRequest):
 @app.post("/query")
 def query(question: str):
     return generate_answer(question)
+
+
+class ResearchRequest(BaseModel):
+    query: str
+
+@app.post("/research-plan")
+def generate_plan(request: ResearchRequest):
+    result = research_graph.invoke({
+        "query": request.query
+    })
+
+    return result
