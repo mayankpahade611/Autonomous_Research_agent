@@ -1,10 +1,10 @@
-from app.retrieval.retriever import retriever_document
+from app.retrieval.retriever import retrieve_documents
 from app.utils.llm import get_llm
 
 def generate_answer(query: str):
-    docs = retriever_document(query)
+    docs = retrieve_documents(query)
 
-    context = "\n\n".join([doc.page_content for doc in docs])
+    context = "\n\n".join([doc.page_content for doc, _ in docs])
 
     prompt = f"""
     You are a research assistant.

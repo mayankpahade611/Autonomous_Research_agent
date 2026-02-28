@@ -5,6 +5,9 @@ from app.retrieval.ingest import ingest_document
 from app.retrieval.rag_pipeline import generate_answer
 from app.graph import research_graph
 from pydantic import BaseModel
+from app.evaluation.grounding import evaluate_grounding
+import time
+
 
 app = FastAPI(title="Autonomos Reserach Agent")
 
@@ -24,7 +27,7 @@ def test_vector():
 
 class IngestRequest(BaseModel):
     text: str
-    source: str = "manual_input"  # default
+    source: str = "manual_input"  
 
 @app.post("/ingest")
 def ingest(request: IngestRequest):
@@ -44,8 +47,27 @@ class ResearchRequest(BaseModel):
 
 @app.post("/research-plan")
 def generate_plan(request: ResearchRequest):
+    start_time = time.time()
+
     result = research_graph.invoke({
-        "query": request.query
+        "query": request.query,
+        "iteration_count": 0
     })
 
-    return result
+    grounding_status = evaluate_grounding(
+        result["summary"],
+        result["retrieved_context"]
+    )
+
+    end_time = time.time()
+
+    execution_time = round(end_time - start_time, 2)
+
+    return {
+        "final_report": result["final_report"],
+        "iterations": result["iteration_count"],
+        "retrieved_chunks": result.get("retrieved_count", 0),
+        "execution_time_seconds": execution_time,
+        "grounding_check": grounding_status
+    }
+

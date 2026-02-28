@@ -1,7 +1,14 @@
 from app.retrieval.vector_store import get_vector_store
 
 
-def retriever_document(query: str, k: int = 5):
+def retrieve_documents(query: str, k: int = 5, score_threshold: float = 0.5):
     vector_store = get_vector_store()
-    retriever = vector_store.as_retriever(search_kwargs={"k": k})
-    return retriever.invoke(query)
+    results = vector_store.similarity_search_with_score(query, k=k)
+
+    filtered = [
+        (doc, score)
+        for doc, score in results
+        if score > score_threshold
+    ]
+
+    return filtered

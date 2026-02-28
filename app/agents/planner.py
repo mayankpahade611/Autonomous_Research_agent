@@ -1,4 +1,5 @@
 from app.utils.llm import get_llm
+from app.utils.logger import log_event
 
 def planner_node(state):
     query = state["query"]
@@ -25,6 +26,8 @@ def planner_node(state):
         plan = eval(response.content)
     except:
         plan = [response.content]
+
+    log_event(f"Planner created {len(plan)} subtopics")
 
     return {
         "query": query,
