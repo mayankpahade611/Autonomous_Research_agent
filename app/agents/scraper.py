@@ -1,35 +1,44 @@
-import requests
+import asyncio
+import aiohttp
 from bs4 import BeautifulSoup
 
 
-def scrape_url(url: str):
+async def fetch_page(session, url):
     try:
-        response = requests.get(url, timeout=10)
-        soup = BeautifulSoup(response.text, "html.parser")
+        async with session.get(url, timeout=10) as response:
+            html = await response.text()
 
-        for script in soup(["script", "style"]):
-            script.decompose()
+            soup = BeautifulSoup(html, "html.parser")
 
-        text = soup.get_text(separator=" ")
-        return text.strip()
+            for script in soup(["script", "style"]):
+                script.decompose()
+
+            text = soup.get_text(separator=" ")
+
+            return {
+                "url": url,
+                "content": text[:8000]
+            }
     except Exception:
         return None
+
+async def scrape_url(urls):
     
+    async with aiohttp.ClientSession() as session:
+        tasks = [
+            fetch_page(session, url)
+            for url in urls
+        ]
 
-def scrape_node(state):
-    search_results = state["search_results"]
+        results = await asyncio.gather(*tasks)
 
-    documents = []
+    return [r for r in results if r]
 
-    for result in search_results:
-        url = result["url"]
-        content = scrape_url(url)
+async def scrape_node(state):
+    
+    urls = [r["url"] for r in state["search_results"]]
 
-        if content and len(content) > 500:
-            documents.append({
-                "url": url,
-                "content": content
-            })
+    documents = await scrape_url(urls)
 
     return {
         **state,

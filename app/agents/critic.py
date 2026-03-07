@@ -8,24 +8,40 @@ def critic_node(state):
     llm = get_llm()
 
     prompt = f"""
-    Evaluate the following research summary.
+    You are a research quality evaluator.
 
-    Check:
-    1. Is it complete?
-    2. Are important aspects missing?
-    3. Is it grounded?
+    Your task is to critically evaluate the provided research summary in relation to the original research question.
 
-    If acceptable, respond with:
-    PASS
+    Evaluation Criteria:
+    1. Completeness — Does the summary sufficiently address the main question?
+    2. Coverage — Are any major aspects, perspectives, or important details missing?
+    3. Grounding — Are the claims supported by the provided information, or do they appear speculative or unsupported?
 
-    If insufficient, respond with:
-    FAIL and explain why.
+    Instructions:
+    - Carefully compare the research question with the summary.
+    - Identify whether the summary adequately covers the core aspects required to answer the question.
+    - Detect missing critical information or logical gaps.
+    - Flag any statements that appear ungrounded, exaggerated, or unsupported.
 
-    Question:
+    Decision Rules:
+    - If the summary is sufficiently complete, relevant, and grounded → respond with **PASS**.
+    - If the summary is incomplete, missing important aspects, or contains unsupported claims → respond with **FAIL** and briefly explain the reasons.
+
+    Research Question:
     {query}
 
-    Summary:
+    Research Summary:
     {summary}
+
+    Output Format:
+    Respond with ONLY one of the following formats:
+
+    PASS
+
+    or
+
+    FAIL
+    <brief explanation of the issues>
     """
 
     response = llm.invoke(prompt)

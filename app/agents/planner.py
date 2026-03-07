@@ -8,16 +8,26 @@ def planner_node(state):
 
     prompt = f"""
 
-    You are a research planner.
+    You are an expert research planner.
 
-    Break the following research question into 3-5 focused subtopics.
+    Your task is to decompose the given research question into 3–5 concise, well-defined subtopics that would help systematically explore the subject.
 
-    Question:
+    Guidelines:
+    - Each subtopic should represent a distinct research angle.
+    - Subtopics should collectively cover the major aspects of the question.
+    - Keep each subtopic short (2–6 words preferred).
+    - Avoid overlap or redundancy.
+    - Focus on areas that would guide deeper investigation.
+
+    Research Question:
     {query}
 
-    Return ONLY a Python list of strings.
+    Output Format:
+    Return ONLY a valid Python list of strings.
+    Do not include explanations, numbering, or additional text.
+
     Example:
-    ["Market size", "Key players", "Risks"]
+    ["Market size", "Key players", "Growth drivers", "Competitive landscape", "Risks"]
     """
 
     response = llm.invoke(prompt)

@@ -46,10 +46,10 @@ class ResearchRequest(BaseModel):
     query: str
 
 @app.post("/research-plan")
-def generate_plan(request: ResearchRequest):
+async def generate_plan(request: ResearchRequest):
     start_time = time.time()
 
-    result = research_graph.invoke({
+    result = await research_graph.ainvoke({
         "query": request.query,
         "iteration_count": 0
     })
@@ -64,8 +64,8 @@ def generate_plan(request: ResearchRequest):
     execution_time = round(end_time - start_time, 2)
 
     return {
-        "final_report": result["final_report"],
-        "iterations": result["iteration_count"],
+        "final_report": result.get("final_report"),
+        "iterations": result.get("iteration_count"),
         "retrieved_chunks": result.get("retrieved_count", 0),
         "execution_time_seconds": execution_time,
         "grounding_check": grounding_status
