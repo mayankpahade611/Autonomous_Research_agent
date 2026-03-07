@@ -13,8 +13,9 @@ def get_vector_store():
     )
 
     client = QdrantClient(
-        url=f"http://{settings.QDRANT_HOST}:{settings.QDRANT_PORT}"
-    )
+    url=settings.QDRANT_URL,
+    api_key=settings.QDRANT_API_KEY
+)
 
     collections = client.get_collections().collections
     collection_names = [c.name for c in collections]
