@@ -4,7 +4,6 @@ from app.retrieval.vector_store import get_vector_store
 from app.retrieval.ingest import ingest_document
 from app.retrieval.rag_pipeline import generate_answer
 from app.graph import research_graph
-from pydantic import BaseModel
 from app.evaluation.grounding import evaluate_grounding
 import time
 
