@@ -1,10 +1,10 @@
 fastapi
 uvicorn
-langchain==1.2.10
-langchain-community==0.4.1
-langgraph==1.0.7
-langchain-groq==1.1.2
-qdrant-client==1.17.0
+langchain
+langchain-community
+langgraph
+langchain-groq
+qdrant-client
 sentence-transformers
 redis
 psycopg2-binary 
