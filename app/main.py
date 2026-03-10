@@ -3,10 +3,11 @@ from pydantic import BaseModel
 from app.retrieval.vector_store import get_vector_store
 from app.retrieval.ingest import ingest_document
 from app.retrieval.rag_pipeline import generate_answer
-from app.graph import research_graph
+from app.graph import get_research_graph
 from app.evaluation.grounding import evaluate_grounding
 import time
 
+graph =get_research_graph()
 
 app = FastAPI(title="Autonomos Reserach Agent")
 
@@ -48,7 +49,7 @@ class ResearchRequest(BaseModel):
 async def generate_plan(request: ResearchRequest):
     start_time = time.time()
 
-    result = await research_graph.ainvoke({
+    result = await graph.ainvoke({
         "query": request.query,
         "iteration_count": 0
     })
