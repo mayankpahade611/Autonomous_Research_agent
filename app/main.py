@@ -41,35 +41,35 @@ def query(question: str):
 class ResearchRequest(BaseModel):
     query: str
 
-@app.post("/research-plan")
-async def generate_plan(request: ResearchRequest):
-    from app.graph import get_research_graph
-    from app.evaluation.grounding import evaluate_grounding
-    graph =get_research_graph()
+# @app.post("/research-plan")
+# async def generate_plan(request: ResearchRequest):
+#     from app.graph import get_research_graph
+#     from app.evaluation.grounding import evaluate_grounding
+#     graph =get_research_graph()
 
-    start_time = time.time()
+#     start_time = time.time()
 
-    result = await graph.ainvoke({
-        "query": request.query,
-        "iteration_count": 0
-    })
+#     result = await graph.ainvoke({
+#         "query": request.query,
+#         "iteration_count": 0
+#     })
 
-    grounding_status = evaluate_grounding(
-        result["summary"],
-        result["retrieved_context"]
-    )
+#     grounding_status = evaluate_grounding(
+#         result["summary"],
+#         result["retrieved_context"]
+#     )
 
-    end_time = time.time()
+#     end_time = time.time()
 
-    execution_time = round(end_time - start_time, 2)
+#     execution_time = round(end_time - start_time, 2)
 
-    return {
-        "final_report": result.get("final_report"),
-        "iterations": result.get("iteration_count"),
-        "retrieved_chunks": result.get("retrieved_count", 0),
-        "execution_time_seconds": execution_time,
-        "grounding_check": grounding_status
-    }
+#     return {
+#         "final_report": result.get("final_report"),
+#         "iterations": result.get("iteration_count"),
+#         "retrieved_chunks": result.get("retrieved_count", 0),
+#         "execution_time_seconds": execution_time,
+#         "grounding_check": grounding_status
+#     }
 
 # from fastapi import FastAPI
 
@@ -82,3 +82,19 @@ async def generate_plan(request: ResearchRequest):
 # @app.get("/health")
 # def health():
 #     return {"status": "OK"}
+
+@app.post("/research-plan")
+async def generate_plan(request: ResearchRequest):
+    try:
+        from app.graph import get_research_graph
+        graph = get_research_graph()
+
+        result = await graph.ainvoke({
+            "query": request.query,
+            "iteration_count": 0
+        })
+
+        return result
+
+    except Exception as e:
+        return {"error": str(e)}
