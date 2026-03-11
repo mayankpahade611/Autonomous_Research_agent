@@ -6,7 +6,7 @@ langgraph
 langchain-groq
 qdrant-client
 sentence-transformers
-redis
+tavily-python
 psycopg2-binary 
 python-dotenv 
 beautifulsoup4 
