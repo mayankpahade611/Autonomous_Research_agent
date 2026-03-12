@@ -1,6 +1,6 @@
 from app.utils.llm import get_llm
 
-def report_node(state):
+async def report_node(state):
     summary = state["summary"]
     query = state["query"]
 
@@ -51,7 +51,7 @@ def report_node(state):
     """
 
 
-    response = llm.invoke(prompt)
+    response = await llm.ainvoke(prompt)
 
     return {
         **state,

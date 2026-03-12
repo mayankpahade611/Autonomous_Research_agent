@@ -34,32 +34,28 @@ def route_after_critic(state):
     return "retrieve"
 
 
+_graph = None
+
 def get_research_graph():
-
-    workflow = StateGraph(ResearchState)
-
-    workflow.add_node("planner", planner_node)
-    workflow.add_node("search", search_node)
-    workflow.add_node("scraper", scrape_node)
-    workflow.add_node("store", store_node)
-    workflow.add_node("retrieve", retrieve_node)
-    workflow.add_node("summarizer", summarizer_node)
-    workflow.add_node("critic", critic_node)
-    workflow.add_node("report", report_node)
-
-    workflow.add_edge(START, "planner")
-    workflow.add_edge("planner", "search")
-    workflow.add_edge("search", "scraper")
-    workflow.add_edge("scraper", "store")
-    workflow.add_edge("store", "retrieve")
-    workflow.add_edge("retrieve", "summarizer")
-    workflow.add_edge("summarizer", "critic")
-
-    workflow.add_conditional_edges(
-        "critic",
-        route_after_critic
-    )
-
-    workflow.add_edge("report", END)
-
-    return workflow.compile()
+    global _graph
+    if _graph is None:
+        workflow = StateGraph(ResearchState)
+        workflow.add_node("planner", planner_node)
+        workflow.add_node("search", search_node)
+        workflow.add_node("scraper", scrape_node)
+        workflow.add_node("store", store_node)
+        workflow.add_node("retrieve", retrieve_node)
+        workflow.add_node("summarizer", summarizer_node)
+        workflow.add_node("critic", critic_node)
+        workflow.add_node("report", report_node)
+        workflow.add_edge(START, "planner")
+        workflow.add_edge("planner", "search")
+        workflow.add_edge("search", "scraper")
+        workflow.add_edge("scraper", "store")
+        workflow.add_edge("store", "retrieve")
+        workflow.add_edge("retrieve", "summarizer")
+        workflow.add_edge("summarizer", "critic")
+        workflow.add_conditional_edges("critic", route_after_critic)
+        workflow.add_edge("report", END)
+        _graph = workflow.compile()
+    return _graph

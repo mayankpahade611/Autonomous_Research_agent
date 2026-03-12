@@ -103,7 +103,6 @@
 from fastapi import FastAPI, BackgroundTasks
 from pydantic import BaseModel
 import time
-import uuid
 
 app = FastAPI(title="Autonomous Research Agent")
 
@@ -143,54 +142,31 @@ def query(question: str):
 class ResearchRequest(BaseModel):
     query: str
 
-# ✅ Step 1: Start the research — returns instantly
 @app.post("/research-plan")
-async def generate_plan(request: ResearchRequest, background_tasks: BackgroundTasks):
-    task_id = str(uuid.uuid4())
-    task_store[task_id] = {"status": "running", "result": None, "error": None}
-    background_tasks.add_task(run_research_task, task_id, request.query)
-    return {"task_id": task_id, "status": "running"}  # returns in <1s ✅
+async def generate_plan(request: ResearchRequest):
+    from app.graph import get_research_graph
+    from app.evaluation.grounding import evaluate_grounding
+    
+    graph = get_research_graph()
+    start_time = time.time()
 
-# ✅ Step 2: The actual heavy work runs in background
-async def run_research_task(task_id: str, query: str):
-    try:
-        from app.graph import get_research_graph
-        from app.evaluation.grounding import evaluate_grounding
+    result = await graph.ainvoke({
+        "query": request.query,
+        "iteration_count": 0
+    })
 
-        graph = get_research_graph()
-        start_time = time.time()
+    grounding_status = evaluate_grounding(
+        result["summary"],
+        result["retrieved_context"]
+    )
 
-        result = await graph.ainvoke({
-            "query": query,
-            "iteration_count": 0
-        })
+    execution_time = round(time.time() - start_time, 2)
 
-        grounding_status = evaluate_grounding(
-            result["summary"],
-            result["retrieved_context"]
-        )
+    return {
+        "final_report": result.get("final_report"),
+        "iterations": result.get("iteration_count"),
+        "retrieved_chunks": result.get("retrieved_count", 0),
+        "execution_time_seconds": execution_time,
+        "grounding_check": grounding_status
+    }
 
-        execution_time = round(time.time() - start_time, 2)
-
-        task_store[task_id] = {
-            "status": "done",
-            "result": {
-                "final_report": result.get("final_report"),
-                "iterations": result.get("iteration_count"),
-                "retrieved_chunks": result.get("retrieved_count", 0),
-                "execution_time_seconds": execution_time,
-                "grounding_check": grounding_status
-            },
-            "error": None
-        }
-
-    except Exception as e:
-        task_store[task_id] = {"status": "error", "result": None, "error": str(e)}
-
-# ✅ Step 3: Poll this until status = "done"
-@app.get("/research-plan/status/{task_id}")
-def get_research_status(task_id: str):
-    task = task_store.get(task_id)
-    if not task:
-        return {"status": "not_found"}
-    return task

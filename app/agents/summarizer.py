@@ -1,7 +1,7 @@
 from app.utils.llm import get_llm
 
 
-def summarizer_node(state):
+async def summarizer_node(state):
     query = state["query"]
     context = state["retrieved_context"]
 
@@ -37,7 +37,7 @@ def summarizer_node(state):
     - Avoid speculation or unsupported conclusions.
     """
 
-    response = llm.invoke(prompt)
+    response = await llm.ainvoke(prompt)
 
     return {
         **state,

@@ -5,20 +5,17 @@ from bs4 import BeautifulSoup
 
 async def fetch_page(session, url):
     try:
-        async with session.get(url, timeout=10) as response:
+        async with session.get(
+            url, 
+            timeout=aiohttp.ClientTimeout(total=5),  # 10s → 5s
+            headers={"User-Agent": "Mozilla/5.0"}    # avoid blocks
+        ) as response:
             html = await response.text()
-
             soup = BeautifulSoup(html, "html.parser")
-
             for script in soup(["script", "style"]):
                 script.decompose()
-
             text = soup.get_text(separator=" ")
-
-            return {
-                "url": url,
-                "content": text[:8000]
-            }
+            return {"url": url, "content": text[:3000]}  # 8000 → 3000
     except Exception:
         return None
 

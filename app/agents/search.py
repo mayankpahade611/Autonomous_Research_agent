@@ -12,8 +12,8 @@ async def search_subtopic(query, subtopic):
         None,
         lambda: client.search(
             query=f"{query} - {subtopic}",
-            search_depth="advanced",
-            max_results=3
+            search_depth="basic",
+            max_results=2
         )
     )
 

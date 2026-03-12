@@ -1,7 +1,7 @@
 from app.utils.llm import get_llm
 from app.utils.logger import log_event
 
-def planner_node(state):
+async def planner_node(state):
     query = state["query"]
 
     llm = get_llm()
@@ -10,12 +10,12 @@ def planner_node(state):
 
     You are an expert research planner.
 
-    Your task is to decompose the given research question into 3–5 concise, well-defined subtopics that would help systematically explore the subject.
+    Your task is to decompose the given research question into 3-5 concise, well-defined subtopics that would help systematically explore the subject.
 
     Guidelines:
     - Each subtopic should represent a distinct research angle.
     - Subtopics should collectively cover the major aspects of the question.
-    - Keep each subtopic short (2–6 words preferred).
+    - Keep each subtopic short (2-6 words preferred).
     - Avoid overlap or redundancy.
     - Focus on areas that would guide deeper investigation.
 
@@ -30,7 +30,7 @@ def planner_node(state):
     ["Market size", "Key players", "Growth drivers", "Competitive landscape", "Risks"]
     """
 
-    response = llm.invoke(prompt)
+    response = await llm.ainvoke(prompt)
 
     try:
         plan = eval(response.content)
