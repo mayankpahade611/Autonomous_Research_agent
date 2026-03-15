@@ -13,13 +13,12 @@ def get_embeddings():
         model_name="sentence-transformers/all-MiniLM-L6-v2"
     )
 
-def get_vector_store():
-    embeddings = get_embeddings()
-
+@lru_cache
+def get_qdrant_client():
     client = QdrantClient(
-    url=settings.QDRANT_URL,
-    api_key=settings.QDRANT_API_KEY
-)
+        url=settings.QDRANT_URL,
+        api_key=settings.QDRANT_API_KEY
+    )
 
     collections = client.get_collections().collections
     collection_names = [c.name for c in collections]
@@ -33,8 +32,13 @@ def get_vector_store():
             )
         )
 
+    return client
+
+@lru_cache
+def get_vector_store():
+
     return Qdrant(
-        client=client,
+        client=get_qdrant_client(),
         collection_name=COLLECTION_NAME,
-        embeddings=embeddings,
+        embeddings=get_embeddings()
     )
