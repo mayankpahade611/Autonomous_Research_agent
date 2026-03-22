@@ -2,11 +2,21 @@ from fastapi import FastAPI, BackgroundTasks
 from pydantic import BaseModel
 import time
 import uuid
+import json
+import redis
+import os
 
 app = FastAPI(title="Autonomous Research Agent")
 
-# in-memory task store
-task_store = {}
+# Redis client
+r = redis.from_url(os.getenv("REDIS_URL"))
+
+def save_task(task_id: str, data: dict):
+    r.setex(task_id, 3600, json.dumps(data))  # saved for 1 hour ✅
+
+def get_task(task_id: str):
+    data = r.get(task_id)
+    return json.loads(data) if data else None
 
 @app.get("/")
 def root():
@@ -44,15 +54,13 @@ def query(question: str):
 class ResearchRequest(BaseModel):
     query: str
 
-# Step 1 — returns task_id instantly ✅
 @app.post("/research-plan")
 async def generate_plan(request: ResearchRequest, background_tasks: BackgroundTasks):
     task_id = str(uuid.uuid4())
-    task_store[task_id] = {"status": "running", "result": None, "error": None}
+    save_task(task_id, {"status": "running", "result": None, "error": None})
     background_tasks.add_task(run_research_task, task_id, request.query)
     return {"task_id": task_id, "status": "running"}
 
-# Step 2 — runs in background, no timeout ✅
 async def run_research_task(task_id: str, query: str):
     try:
         from app.graph import get_research_graph
@@ -73,7 +81,7 @@ async def run_research_task(task_id: str, query: str):
 
         execution_time = round(time.time() - start_time, 2)
 
-        task_store[task_id] = {
+        save_task(task_id, {
             "status": "done",
             "result": {
                 "final_report": result.get("final_report"),
@@ -83,15 +91,14 @@ async def run_research_task(task_id: str, query: str):
                 "grounding_check": grounding_status.split("\n")[0]
             },
             "error": None
-        }
+        })
 
     except Exception as e:
-        task_store[task_id] = {"status": "error", "result": None, "error": str(e)}
+        save_task(task_id, {"status": "error", "result": None, "error": str(e)})
 
-# Step 3 — poll this until status = "done" ✅
 @app.get("/research-plan/status/{task_id}")
 def get_status(task_id: str):
-    task = task_store.get(task_id)
+    task = get_task(task_id)
     if not task:
         return {"status": "not_found"}
     return task

@@ -13,5 +13,6 @@ python-dotenv
 beautifulsoup4 
 requests
 rank-bm25
+redis
 aiohttp
 streamlit
