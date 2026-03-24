@@ -260,10 +260,12 @@ h1, h2, h3 { font-family: 'DM Serif Display', serif; }
 
 /* Divider */
 .divider {
+    width: 100%;
     max-width: 720px;
     margin: 2rem auto;
     border: none;
     border-top: 1px solid rgba(255,255,255,0.06);
+    display: block;
 }
 
 /* Center columns */
@@ -398,7 +400,7 @@ if run:
             st.markdown(f'<div class="error-card">✗ Connection error: {str(e)}</div>', unsafe_allow_html=True)
 
 # ── Footer ───────────────────────────────────────────────────────────────────
-st.markdown('<hr class="divider">', unsafe_allow_html=True)
+st.markdown('<div style="max-width:720px; margin: 2rem auto; border-top: 1px solid rgba(255,255,255,0.06);"></div>', unsafe_allow_html=True)
 st.markdown("""
 <p style="text-align:center; font-family:'DM Mono',monospace; font-size:0.65rem; 
 letter-spacing:0.15em; color:#333; text-transform:uppercase;">
