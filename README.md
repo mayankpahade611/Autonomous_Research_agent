@@ -1,3 +1,13 @@
+---
+title: Autonomous Research Agent
+emoji: 🔬
+colorFrom: orange
+colorTo: purple
+sdk: docker
+pinned: false
+app_port: 7860
+---
+
 # 🔬 Autonomous Research Agent
 
 An AI-powered research agent that autonomously plans, searches, retrieves, and synthesizes structured investment-grade research reports on any topic.
