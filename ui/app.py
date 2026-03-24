@@ -47,6 +47,10 @@ h1, h2, h3 { font-family: 'DM Serif Display', serif; }
 .hero {
     text-align: center;
     padding: 3rem 1rem 2rem;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 .hero-label {
     font-family: 'DM Mono', monospace;
@@ -73,9 +77,11 @@ h1, h2, h3 { font-family: 'DM Serif Display', serif; }
     color: #888;
     font-weight: 300;
     max-width: 500px;
-    margin: 0 auto;          
+    margin: 0 auto;
     line-height: 1.6;
-    text-align: center;      
+    text-align: center;
+    display: block;
+    width: 100%;
 }
 
 /* Input area */
