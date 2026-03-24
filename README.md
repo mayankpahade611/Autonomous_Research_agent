@@ -1,7 +1,7 @@
 ---
 title: Autonomous Research Agent
 emoji: 🔬
-colorFrom: orange
+colorFrom: red
 colorTo: purple
 sdk: docker
 pinned: false
