@@ -73,8 +73,9 @@ h1, h2, h3 { font-family: 'DM Serif Display', serif; }
     color: #888;
     font-weight: 300;
     max-width: 500px;
-    margin: 0 auto;
+    margin: 0 auto;          
     line-height: 1.6;
+    text-align: center;      
 }
 
 /* Input area */
@@ -277,7 +278,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ── Input ────────────────────────────────────────────────────────────────────
-col1, col2, col3 = st.columns([1, 4, 1])
+col1, col2, col3 = st.columns([1, 6, 1])
 with col2:
     query = st.text_input(
         "Research Question",
