@@ -1,17 +1,11 @@
 from qdrant_client import QdrantClient
 from qdrant_client.models import VectorParams, Distance
-from langchain_qdrant import Qdrant
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_qdrant import QdrantVectorStore
+from app.retrieval.embeddings import get_embedding_model
 from app.config import settings
 from functools import lru_cache
 
 COLLECTION_NAME = "research_docs"
-
-@lru_cache
-def get_embeddings():
-    return HuggingFaceEmbeddings(
-        model_name="sentence-transformers/all-MiniLM-L6-v2"
-    )
 
 @lru_cache
 def get_qdrant_client():
@@ -36,9 +30,8 @@ def get_qdrant_client():
 
 @lru_cache
 def get_vector_store():
-
-    return Qdrant(
+    return QdrantVectorStore(
         client=get_qdrant_client(),
         collection_name=COLLECTION_NAME,
-        embeddings=get_embeddings()
+        embedding=get_embedding_model(),  
     )
