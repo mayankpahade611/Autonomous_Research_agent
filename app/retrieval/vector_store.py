@@ -1,6 +1,6 @@
 from qdrant_client import QdrantClient
 from qdrant_client.models import VectorParams, Distance
-from langchain_community.vectorstores import Qdrant
+from langchain_qdrant import Qdrant
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from app.config import settings
 from functools import lru_cache

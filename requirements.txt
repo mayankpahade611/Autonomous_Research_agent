@@ -7,6 +7,7 @@ langgraph
 langchain-groq
 qdrant-client
 sentence-transformers
+langchain-qdrant
 tavily-python
 psycopg2-binary 
 python-dotenv 
