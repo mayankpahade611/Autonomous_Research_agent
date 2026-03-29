@@ -5,36 +5,6 @@ import time
 # ── Config ──────────────────────────────────────────────────────────────────
 API_URL = "https://Phantom611-autonoumous-research-agent.hf.space"
 
-def warmup_api():
-    """Ping health endpoint to wake up the server."""
-    try:
-        requests.get(f"{API_URL}/health", timeout=30)
-    except:
-        pass
-
-def call_api_with_retry(query, retries=3, wait=10):
-    """Call research API with automatic retry on 500 errors."""
-    for attempt in range(retries):
-        try:
-            response = requests.post(
-                f"{API_URL}/research-plan",
-                json={"query": query},
-                timeout=300
-            )
-            if response.status_code == 200:
-                return response
-            elif response.status_code == 500 and attempt < retries - 1:
-                st.warning(f"⏳ Server warming up... retrying ({attempt + 1}/{retries})")
-                time.sleep(wait)
-            else:
-                return response
-        except requests.exceptions.Timeout:
-            return None
-        except Exception:
-            if attempt < retries - 1:
-                time.sleep(wait)
-    return None
-
 st.set_page_config(
     page_title="Research Agent",
     page_icon="🔬",
@@ -45,7 +15,7 @@ st.set_page_config(
 # ── Custom CSS ───────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&    family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap');
 
 /* Reset & base */
 *, *::before, *::after { box-sizing: border-box; }
@@ -77,6 +47,10 @@ h1, h2, h3 { font-family: 'DM Serif Display', serif; }
 .hero {
     text-align: center;
     padding: 3rem 1rem 2rem;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 .hero-label {
     font-family: 'DM Mono', monospace;
@@ -105,6 +79,9 @@ h1, h2, h3 { font-family: 'DM Serif Display', serif; }
     max-width: 500px;
     margin: 0 auto;
     line-height: 1.6;
+    text-align: center;
+    display: block;
+    width: 100%;
 }
 
 /* Input area */
@@ -283,10 +260,12 @@ h1, h2, h3 { font-family: 'DM Serif Display', serif; }
 
 /* Divider */
 .divider {
+    width: 100%;
     max-width: 720px;
     margin: 2rem auto;
     border: none;
     border-top: 1px solid rgba(255,255,255,0.06);
+    display: block;
 }
 
 /* Center columns */
@@ -306,17 +285,8 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# ── Warmup Notice ────────────────────────────────────────────────────────────
-st.markdown("""
-<div style="max-width:720px; margin: 0 auto 1rem; background:rgba(255,140,50,0.08); 
-border:1px solid rgba(255,140,50,0.2); border-radius:10px; padding:0.75rem 1rem; 
-font-family:'DM Mono',monospace; font-size:0.75rem; color:#ff8c32; text-align:center;">
-⚡ First request may take 30–60s to wake up the server. Subsequent requests are fast.
-</div>
-""", unsafe_allow_html=True)
-
 # ── Input ────────────────────────────────────────────────────────────────────
-col1, col2, col3 = st.columns([1, 4, 1])
+col1, col2, col3 = st.columns([1, 6, 1])
 with col2:
     query = st.text_input(
         "Research Question",
@@ -334,28 +304,27 @@ if run:
         status_placeholder = st.empty()
         progress_placeholder = st.empty()
 
+        # Show running state
+        status_placeholder.markdown(f"""
+        <div class="status-card">
+            <div class="status-label">Agent Status</div>
+            <div class="status-running">
+                <div class="pulse"></div>
+                Researching: "{query}"
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
         start_time = time.time()
 
         try:
-            # Warmup the server first
-            with progress_placeholder:
-                with st.spinner("🔄 Connecting to research agent..."):
-                    warmup_api()
-
-            # Show running state after warmup
-            status_placeholder.markdown(f"""
-            <div class="status-card">
-                <div class="status-label">Agent Status</div>
-                <div class="status-running">
-                    <div class="pulse"></div>
-                    Researching: "{query}"
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-
             with progress_placeholder:
                 with st.spinner(""):
-                    response = call_api_with_retry(query, retries=3, wait=10)
+                    response = requests.post(
+                        f"{API_URL}/research-plan",
+                        json={"query": query},
+                        timeout=300
+                    )
 
             if response.status_code == 200:
                 result = response.json()
@@ -431,7 +400,7 @@ if run:
             st.markdown(f'<div class="error-card">✗ Connection error: {str(e)}</div>', unsafe_allow_html=True)
 
 # ── Footer ───────────────────────────────────────────────────────────────────
-st.markdown('<hr class="divider">', unsafe_allow_html=True)
+st.markdown('<div style="max-width:720px; margin: 2rem auto; border-top: 1px solid rgba(255,255,255,0.06);"></div>', unsafe_allow_html=True)
 st.markdown("""
 <p style="text-align:center; font-family:'DM Mono',monospace; font-size:0.65rem; 
 letter-spacing:0.15em; color:#333; text-transform:uppercase;">
