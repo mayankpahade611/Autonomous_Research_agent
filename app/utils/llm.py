@@ -7,7 +7,7 @@ def get_llm():
     global _llm
     if _llm is None:
         _llm = ChatGroq(
-            model="llama-3.1-8b-instant",
+            model=os.getenv("GROQ_MODEL", "openai/gpt-oss-20b"),
             temperature=0,
             groq_api_key=os.getenv("GROQ_API_KEY")
         )
